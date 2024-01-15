@@ -26,17 +26,9 @@ class TransformerTimeSeries(torch.nn.Module):
             .unsqueeze(0)
             .repeat(z_embedding.size(1), 1)
         )
-        # print(pos_encoder.size())
         positional_embeddings = self.positional_embedding(pos_encoder).permute(1, 0, 2)
-        # print(positional_embeddings.size())
-
         input_embedding = z_embedding + positional_embeddings
-
         transformer_embedding = self.transformer_decoder(input_embedding)
         transformer_embedding = transformer_embedding.permute(1, 0, 2)
-
-        # output = self.fc1(transformer_embedding.permute(1, 0, 2)[:, -1, :])
         output = self.fc1(transformer_embedding.reshape(transformer_embedding.size(0), -1))
-        # print(output.size())
-
         return output
