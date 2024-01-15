@@ -10,7 +10,6 @@ from models.CNN import context_embedding
 class TransformerTimeSeries(torch.nn.Module):
     def __init__(self, input_size, hidden_size, output_size):
         super(TransformerTimeSeries, self).__init__()
-        # self.input_embedding = causal_convolution_layer.context_embedding(2, 256, 9)
         self.cnn = context_embedding(input_size, 256, 5)
         self.fc = torch.nn.Linear(input_size, 256)
         self.positional_embedding = torch.nn.Embedding(512, 256)
@@ -21,12 +20,7 @@ class TransformerTimeSeries(torch.nn.Module):
         self.fc1 = torch.nn.Linear(256*96, output_size)
 
     def forward(self, x):
-        # input_embedding returns shape (Batch size,embedding size,sequence len) -> need (sequence len,Batch size,embedding_size)
-        # z = x.permute(0, 2, 1)
-        # z_embedding = self.cnn(z).permute(2, 0, 1)
         z_embedding = self.fc(x).permute(1, 0, 2)
-
-        # get my positional embeddings (Batch size, sequence_len, embedding_size) -> need (sequence len,Batch size,embedding_size)
         pos_encoder = (
             torch.arange(0, 96, device="cuda:0")
             .unsqueeze(0)
